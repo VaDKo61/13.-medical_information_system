@@ -20,7 +20,13 @@ def test_list_consultations_sorted_by_created_at(auth_client, setup_data):
         ('patient_name', 'Анна', 'patient.first_name'),
     ]
 )
-def test_list_consultations_search_by_admin(auth_client, setup_data, param, value, field):
+def test_list_consultations_search_by_admin(
+        auth_client,
+        setup_data,
+        param,
+        value,
+        field
+):
     client = auth_client(setup_data['adm_user'])
     url = reverse('consultation-list') + f'?{param}={value}'
     response = client.get(url)

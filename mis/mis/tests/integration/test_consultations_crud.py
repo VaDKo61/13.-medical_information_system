@@ -55,18 +55,6 @@ def test_delete_consultation(auth_client, setup_data):
 
 
 @pytest.mark.django_db
-def test_change_status_action(auth_client, setup_data):
-    client = auth_client(setup_data['doctor_1_user'])
-    url = reverse('consultation-change-status', args=[setup_data['c1'].id])
-    status = 'finished'
-    payload = {'status': status}
-    response = client.post(url, payload, format='json')
-    assert response.status_code == 200
-    setup_data['c1'].refresh_from_db()
-    assert setup_data['c1'].status == status
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'user_key, new_status, expected_status_code, should_update',
     [
@@ -74,7 +62,13 @@ def test_change_status_action(auth_client, setup_data):
         ('patient_1_user', 'finished', 403, False),
     ]
 )
-def test_change_status_action(auth_client, setup_data, user_key, new_status, expected_status_code, should_update):
+def test_change_status_action(
+        auth_client,
+        setup_data,
+        user_key, new_status,
+        expected_status_code,
+        should_update
+):
     client = auth_client(setup_data[user_key])
     url = reverse('consultation-change-status', args=[setup_data['c1'].id])
     response = client.post(url, {'status': new_status}, format='json')

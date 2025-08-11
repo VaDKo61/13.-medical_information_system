@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_403_FORBIDDEN
 
 from .filters import ConsultationFilter
 from .models import Consultation
@@ -12,7 +12,10 @@ from .permissions import ConsultationPermission
 
 
 class ConsultationViewSet(viewsets.ModelViewSet):
-    queryset = Consultation.objects.select_related('doctor', 'patient').all().order_by('-created_at')
+    queryset = (Consultation.objects.
+                select_related('doctor', 'patient').
+                all().
+                order_by('-created_at'))
     serializer_class = ConsultationSerializer
     permission_classes = [IsAuthenticated, ConsultationPermission]
     filter_backends = [DjangoFilterBackend]

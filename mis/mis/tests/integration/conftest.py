@@ -66,7 +66,12 @@ def setup_data(create_user):
     ]
 
     consultations = {}
-    for i, (doc_key, pat_key, status, created_at) in enumerate(consultations_info, start=1):
+    for i, (
+            doc_key,
+            pat_key,
+            status,
+            created_at
+    ) in enumerate(consultations_info, start=1):
         consultations[f'c{i}'] = Consultation.objects.create(
             start_time=now,
             end_time=now,

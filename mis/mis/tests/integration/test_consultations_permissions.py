@@ -12,7 +12,13 @@ from django.urls import reverse
         ('patient_2_user', ['c2'], ['c1', 'c3']),
     ]
 )
-def test_user_sees_only_their_consultations(auth_client, setup_data, user_key, expected_ids, unexpected_ids):
+def test_user_sees_only_their_consultations(
+        auth_client,
+        setup_data,
+        user_key,
+        expected_ids,
+        unexpected_ids
+):
     client = auth_client(setup_data[user_key])
     url = reverse('consultation-list')
     response = client.get(url)
