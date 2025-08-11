@@ -29,18 +29,28 @@ class ConsultationSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('created_at',)
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['doctor'] = DoctorSerializer(instance.doctor).data
+        representation['patient'] = PatientSerializer(instance.patient).data
+        return representation
+
     def validate(self, data):
         request = self.context.get('request')
         user = getattr(request, 'user', None)
         role = getattr(user, 'role', None)
         if user and role == 'patient':
-            if 'patient' in data and data['patient'] != user:
+            if 'patient' in data and data['patient'].user != user:
                 raise serializers.ValidationError(
                     'Пациент может создавать только свои записи.'
                 )
         if user and role == 'doctor':
-            if 'doctor' in data and data['doctor'] != user:
+            if 'doctor' in data and data['doctor'].user != user:
                 raise serializers.ValidationError(
                     'Доктор может создавать только свои записи.'
                 )
         return data
+
+
+class ChangeStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=Consultation.STATUS_CHOICES)

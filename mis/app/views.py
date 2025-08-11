@@ -7,12 +7,12 @@ from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
 
 from .filters import ConsultationFilter
 from .models import Consultation
-from .serializers import ConsultationSerializer
+from .serializers import ConsultationSerializer, ChangeStatusSerializer
 from .permissions import ConsultationPermission
 
 
 class ConsultationViewSet(viewsets.ModelViewSet):
-    queryset = Consultation.objects.select_related('doctor', 'patient').all()
+    queryset = Consultation.objects.select_related('doctor', 'patient').all().order_by('-created_at')
     serializer_class = ConsultationSerializer
     permission_classes = [IsAuthenticated, ConsultationPermission]
     filter_backends = [DjangoFilterBackend]
@@ -26,21 +26,22 @@ class ConsultationViewSet(viewsets.ModelViewSet):
             return qs.filter(doctor=user.doctor_profile)
         if role == 'patient' and getattr(user, 'patient_profile', None):
             return qs.filter(patient=user.patient_profile)
-        return qs
+        else:
+            qs = qs.none()
+        return qs.order_by('-created_at')
 
     @action(detail=True, methods=['post'], url_path='change-status')
-    def change_status(self, request):
+    def change_status(self, request, pk=None):
         consultation = self.get_object()
         if request.user.role == 'patient':
             return Response(
                 {'detail': 'Вы не можете менять статус консультации'},
                 status=HTTP_403_FORBIDDEN
             )
-        new_status = request.data.get('status')
-        if new_status not in dict(Consultation.STATUS_CHOICES):
-            return Response(
-                {'detail': 'Invalid status'},
-                status=HTTP_400_BAD_REQUEST)
-        consultation.status = new_status
+        serializer = ChangeStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        consultation.status = serializer.validated_data['status']
         consultation.save()
+
         return Response(self.get_serializer(consultation).data)
