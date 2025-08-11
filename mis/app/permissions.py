@@ -6,12 +6,18 @@ class ConsultationPermission(BasePermission):
         user = request.user
         role = getattr(user, 'role', None)
 
-        if role == 'admin' or getattr(user, 'is_staff', None) or getattr(user, 'is_superuser', None):
+        if (
+                role == 'admin'
+                or getattr(user, 'is_staff', None)
+                or getattr(user, 'is_superuser', None)
+        ):
             return True
         if role == 'doctor' and getattr(request.user, 'doctor_profile', None):
-            return getattr(obj, 'doctor_id', None) == getattr(user.doctor_profile, 'id', None)
+            return (getattr(obj, 'doctor_id', None) ==
+                    getattr(user.doctor_profile, 'id', None))
         if role == 'patient' and getattr(user, 'patient_profile', None):
-            return getattr(obj, 'patient_id', None) == getattr(user.patient_profile, 'id', None)
+            return (getattr(obj, 'patient_id', None) ==
+                    getattr(user.patient_profile, 'id', None))
         return False
 
     def has_permission(self, request, view):

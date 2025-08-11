@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import *
+from .models import Clinic, Doctor, Patient, Consultation
 
 
 class ClinicSerializer(serializers.ModelSerializer):
@@ -35,8 +35,12 @@ class ConsultationSerializer(serializers.ModelSerializer):
         role = getattr(user, 'role', None)
         if user and role == 'patient':
             if 'patient' in data and data['patient'] != user:
-                raise serializers.ValidationError('Пациент может создавать только свои записи.')
+                raise serializers.ValidationError(
+                    'Пациент может создавать только свои записи.'
+                )
         if user and role == 'doctor':
             if 'doctor' in data and data['doctor'] != user:
-                raise serializers.ValidationError('Доктор может создавать только свои записи.')
+                raise serializers.ValidationError(
+                    'Доктор может создавать только свои записи.'
+                )
         return data
