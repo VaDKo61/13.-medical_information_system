@@ -19,24 +19,22 @@ class ConsultationFilter(django_filters.FilterSet):
         model = Consultation
         fields = ['doctor_name', 'patient_name', 'name', 'status']
 
-    @staticmethod
-    def filter_doctor_name(queryset, value):
+    def filter_doctor_name(self, queryset, name, value):
         return queryset.filter(
             doctor__first_name__icontains=value
         ) | queryset.filter(
             doctor__last_name__icontains=value
         ) | queryset.filter(
-            doctor__middle_name__icontains=value
+            doctor__surname__icontains=value
         )
 
-    @staticmethod
-    def filter_patient_name(queryset, value):
+    def filter_patient_name(self, queryset, name, value):
         return queryset.filter(
             patient__first_name__icontains=value
         ) | queryset.filter(
             patient__last_name__icontains=value
         ) | queryset.filter(
-            patient__middle_name__icontains=value
+            patient__surname__icontains=value
         )
 
     def filter_name(self, queryset, name, value):
