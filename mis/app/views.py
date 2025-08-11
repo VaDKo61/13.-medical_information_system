@@ -1,6 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from .filters import ConsultationFilter
 from .models import Consultation
 from .serializers import ConsultationSerializer
 from .permissions import ConsultationPermission
@@ -10,11 +12,8 @@ class ConsultationViewSet(viewsets.ModelViewSet):
     queryset = Consultation.objects.select_related('doctor', 'patient').all()
     serializer_class = ConsultationSerializer
     permission_classes = [IsAuthenticated, ConsultationPermission]
-
-    # filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    # search_fields = ['doctor__last_name', 'doctor__first_name', 'patient__last_name', 'patient__first_name']
-    # ordering_fields = ['created_at']
-    # filterset_fields = ['status']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ConsultationFilter
 
     def get_queryset(self):
         user = self.request.user
