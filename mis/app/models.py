@@ -12,10 +12,19 @@ class Clinic(models.Model):
         return self.name
 
 
-class Doctor(models.Model):
+class PersonBase(models.Model):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     surname = models.CharField(max_length=150)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f'{self.last_name} {self.first_name}'
+
+
+class Doctor(PersonBase):
     specialization = models.CharField(max_length=200)
     clinics = models.ManyToManyField(Clinic, related_name='doctors')
     user = models.OneToOneField(
@@ -23,23 +32,14 @@ class Doctor(models.Model):
         on_delete=models.CASCADE,
         related_name='doctor_profile')
 
-    def __str__(self):
-        return f'{self.last_name} {self.first_name}'
 
-
-class Patient(models.Model):
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    surname = models.CharField(max_length=150)
+class Patient(PersonBase):
     phone = models.CharField(max_length=20)
     email = models.EmailField()
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name='patient_profile')
-
-    def __str__(self):
-        return f'{self.last_name} {self.first_name}'
 
 
 class Consultation(models.Model):
