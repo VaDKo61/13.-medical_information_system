@@ -1,6 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
 
 from .filters import ConsultationFilter
 from .models import Consultation
@@ -24,3 +27,20 @@ class ConsultationViewSet(viewsets.ModelViewSet):
         if role == 'patient' and getattr(user, 'patient_profile', None):
             return qs.filter(patient=user.patient_profile)
         return qs
+
+    @action(detail=True, methods=['post'], url_path='change-status')
+    def change_status(self, request):
+        consultation = self.get_object()
+        if request.user.role == 'patient':
+            return Response(
+                {'detail': 'Вы не можете менять статус консультации'},
+                status=HTTP_403_FORBIDDEN
+            )
+        new_status = request.data.get('status')
+        if new_status not in dict(Consultation.STATUS_CHOICES):
+            return Response(
+                {'detail': 'Invalid status'},
+                status=HTTP_400_BAD_REQUEST)
+        consultation.status = new_status
+        consultation.save()
+        return Response(self.get_serializer(consultation).data)

@@ -9,9 +9,7 @@ class ConsultationFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method='filter_name')
     status = django_filters.CharFilter(field_name='status', lookup_expr='iexact')
     ordering = django_filters.OrderingFilter(
-        fields=(
-            ('created_at',),
-        ),
+        fields=('created_at',),
         field_labels={
             'created_at': 'Дата создания',
         }
