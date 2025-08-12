@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -33,6 +34,11 @@ class ConsultationViewSet(viewsets.ModelViewSet):
             qs = qs.none()
         return qs.order_by('-created_at')
 
+    @swagger_auto_schema(
+        method='post',
+        request_body=ChangeStatusSerializer,
+        responses={200: 'ConsultationSerializer'}
+    )
     @action(detail=True, methods=['post'], url_path='change-status')
     def change_status(self, request, pk=None):
         consultation = self.get_object()
@@ -48,3 +54,4 @@ class ConsultationViewSet(viewsets.ModelViewSet):
         consultation.save()
 
         return Response(self.get_serializer(consultation).data)
+
