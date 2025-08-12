@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': os.getenv('DATABASE_NAME', 'medical_information_system'),
         'USER': os.getenv('DATABASE_USERNAME', 'postgres'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', '123'),
-        'HOST': os.getenv('DATABASE_HOST', '127.0.0.1'),
+        'HOST': os.getenv('DATABASE_HOST', 'db'),
         'PORT': os.getenv('DATABASE_PORT', '5432'),
     }
 }
